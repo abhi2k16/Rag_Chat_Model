@@ -1,0 +1,18 @@
+{
+  "Attention_is_All_You_Need.pdf": {
+    "doc_id": "8333c54d-4298-4543-8393-802d0ac2d3f2",
+    "hash": "18e1b007a1dab45b30cc861ba2dfda25",
+    "last_indexed": "2026-04-27T19:36:43.327455",
+    "num_chunks": 65,
+    "previous_hash": "18e1b007a1dab45b30cc861ba2dfda25",
+    "previous_indexed": "2026-04-27T19:01:21.975805"
+  },
+  "MachineLearning-Lecture01.pdf": {
+    "doc_id": "78de870d-ef0f-4f86-bd61-11d84f7a1c58",
+    "hash": "67451841484f7423fdabf7ef24c8d648",
+    "last_indexed": "2026-04-27T19:36:52.549325",
+    "num_chunks": 138,
+    "previous_hash": "67451841484f7423fdabf7ef24c8d648",
+    "previous_indexed": "2026-04-27T19:01:29.460045"
+  }
+}

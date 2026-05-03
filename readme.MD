@@ -33,10 +33,10 @@ Main libraries and their use in this project:
 
 ## Main Workflow
 
-When you run:
+When you run the main executable:
 
 ```powershell
-python generation_rag.py
+python main.py
 ```
 
 the pipeline runs in this order:
@@ -294,7 +294,7 @@ If PDFs are moved, update `PDF_FILES` so each path points to an existing file.
 ### 4. Run generation
 
 ```powershell
-python generation_rag.py
+python main.py
 ```
 
 After setup, the terminal shows:

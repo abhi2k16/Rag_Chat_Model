@@ -16,28 +16,42 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-PDF_FOLDER = "c:\\Users\\abhij\\Desktop\\GenAIwithLLMs\\LangChain_projects\\"
-
-file_name = "Attention_is_All_You_Need.pdf"
-PDF_PATH = os.path.join(PDF_FOLDER, file_name)
+PROJECT_FOLDER = Path(__file__).resolve().parent
+PDF_FOLDER = PROJECT_FOLDER / "rag_docs"
+PDF_FILES = [str(path) for path in sorted(PDF_FOLDER.glob("*.pdf"))]
 # ─────────────────────────────────────────────
 # STEP 1: LOAD DOCUMENT
 # ─────────────────────────────────────────────
 print("=" * 50)
-print("STEP 1: Loading Document")
+print("STEP 1: Loading Documents")
 print("=" * 50)
 
-docs = []
-with pdfplumber.open(PDF_PATH) as pdf:
-    for i, page in enumerate(pdf.pages):
-        text = page.extract_text()
-        if text and text.strip():
-            docs.append(Document(
-                page_content=text,
-                metadata={"source": PDF_PATH, "page": i + 1}
-            ))
+if not PDF_FILES:
+    raise FileNotFoundError(f"No PDF files found in {PDF_FOLDER}")
 
-print(f"  Loaded {len(docs)} pages from: {PDF_PATH}")
+docs = []
+for pdf_path in PDF_FILES:
+    filename = Path(pdf_path).name
+    page_count = 0
+    with pdfplumber.open(pdf_path) as pdf:
+        for i, page in enumerate(pdf.pages):
+            text = page.extract_text()
+            if text and text.strip():
+                docs.append(Document(
+                    page_content=text,
+                    metadata={
+                        "source": pdf_path,
+                        "filename": filename,
+                        "page": i + 1,
+                    }
+                ))
+                page_count += 1
+    print(f"  Loaded {page_count} pages from: {filename}")
+
+if not docs:
+    raise ValueError(f"No extractable text found in PDFs under {PDF_FOLDER}")
+
+print(f"  Loaded {len(docs)} total pages from {len(PDF_FILES)} PDF(s)")
 print(f"  Sample (Page 1, first 200 chars):\n  {docs[0].page_content[:200]!r}\n")
 
 # ─────────────────────────────────────────────
@@ -212,7 +226,7 @@ print("RAG Pipeline Ready! Type 'exit' to quit.")
 print("=" * 50 + "\n")
 
 while True:
-    question = input("Ask about 'Attention Is All You Need' paper: ").strip()
+    question = input("Ask about the indexed documents: ").strip()
     if question.lower() in ("exit", "quit"):
         print("Exiting RAG pipeline.")
         break
@@ -222,5 +236,3 @@ while True:
     answer = rag_chain.invoke(question)
     print(f"\nAnswer: {answer}\n")
     print("-" * 50 + "\n")
-
-

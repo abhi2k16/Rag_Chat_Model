@@ -79,6 +79,8 @@ def load_and_split_docs():
     """
     # Load the tracker JSON that stores doc_ids and file hashes across runs
     tracker        = load_tracker()
+    if not PDF_FILES:
+        raise FileNotFoundError(f"No PDF files found in {PDF_FOLDER}")
     # Build list of (path, doc_id) — reuses existing doc_id if file was seen before
     files_to_index = [(p, get_or_create_doc_id(p, tracker)) for p in PDF_FILES]
     docs = []  # Will hold one Document per valid page
@@ -118,6 +120,9 @@ def load_and_split_docs():
     # ── STAGE 2: Text Splitting ─────────────────────────────────────────────
     # RecursiveCharacterTextSplitter tries to split on paragraph breaks first,
     # then newlines, then sentences, then spaces — preserving semantic boundaries.
+    if not docs:
+        raise ValueError(f"No extractable text found in PDFs under {PDF_FOLDER}")
+
     print("    Splitting into chunks...")
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,                          # Max characters per chunk

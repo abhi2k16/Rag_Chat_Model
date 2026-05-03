@@ -15,20 +15,34 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-#PDF_PATH = "LangChain Chat with Your Data/MachineLearning-Lecture01.pdf"
-PDF_PATH = "Attention Is All You Need.pdf"
-# 1. Load PDF with pdfplumber
-print(f"Loading: {PDF_PATH}")
+PROJECT_FOLDER = Path(__file__).resolve().parent
+PDF_FOLDER = PROJECT_FOLDER / "rag_docs"
+PDF_FILES = [str(path) for path in sorted(PDF_FOLDER.glob("*.pdf"))]
+
+# 1. Load PDFs with pdfplumber
+if not PDF_FILES:
+    raise FileNotFoundError(f"No PDF files found in {PDF_FOLDER}")
+
+print(f"Loading {len(PDF_FILES)} PDF(s) from: {PDF_FOLDER}")
 docs = []
-with pdfplumber.open(PDF_PATH) as pdf:
-    for i, page in enumerate(pdf.pages):
-        text = page.extract_text()
-        if text and text.strip():
-            docs.append(Document(
-                page_content=text,
-                metadata={"source": PDF_PATH, "page": i + 1}
-            ))
-print(f"Loaded {len(docs)} pages")
+for pdf_path in PDF_FILES:
+    filename = Path(pdf_path).name
+    page_count = 0
+    with pdfplumber.open(pdf_path) as pdf:
+        for i, page in enumerate(pdf.pages):
+            text = page.extract_text()
+            if text and text.strip():
+                docs.append(Document(
+                    page_content=text,
+                    metadata={"source": pdf_path, "filename": filename, "page": i + 1}
+                ))
+                page_count += 1
+    print(f"Loaded {page_count} pages from {filename}")
+
+if not docs:
+    raise ValueError(f"No extractable text found in PDFs under {PDF_FOLDER}")
+
+print(f"Loaded {len(docs)} total pages")
 
 # 2. Split into chunks
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)

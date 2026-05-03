@@ -27,19 +27,17 @@ from langchain_postgres.vectorstores import PGVector           # PostgreSQL-back
 # ─────────────────────────────────────────────
 # CONFIG  (imported by retrieval.py and generation.py)
 # ─────────────────────────────────────────────
-PDF_FOLDER      = Path(__file__).resolve().parent                                  # Root folder for all project files
-TRACKER_FILE    = str(PDF_FOLDER / "hf_doc_change_tracker.json")                   # JSON file that stores doc hashes and last-indexed timestamps
-RECORD_DB       = f"sqlite:///{(PDF_FOLDER / 'hf_record_manager.db').as_posix()}"  # SQLite DB used by SQLRecordManager to track which chunks are indexed
+PROJECT_FOLDER  = Path(__file__).resolve().parent                                  # Root folder for project files
+PDF_FOLDER      = PROJECT_FOLDER / "rag_docs"                                      # Folder containing PDF documents to index
+TRACKER_FILE    = str(PROJECT_FOLDER / "hf_doc_change_tracker.json")               # JSON file that stores doc hashes and last-indexed timestamps
+RECORD_DB       = f"sqlite:///{(PROJECT_FOLDER / 'hf_record_manager.db').as_posix()}"  # SQLite DB used by SQLRecordManager to track which chunks are indexed
 HF_MODEL        = "sentence-transformers/all-MiniLM-L6-v2"                        # Lightweight 384-dim embedding model, runs fully on CPU
 PG_USER         = "Langchain"                                                      # PostgreSQL username
 PG_PASSWORD     = "Langchain"                                                      # PostgreSQL password
 PG_CONNECTION   = f"postgresql+psycopg://{PG_USER}:{PG_PASSWORD}@localhost:6024/Langchain"  # Full PGVector connection string (port 6024 = Docker container)
 COLLECTION_NAME = "hf_docs"                                                        # PGVector collection name for this project
 
-PDF_FILES = [                                                                      # List of PDF files to load and index
-    str(PDF_FOLDER / "Attention_is_All_You_Need.pdf"),
-    str(PDF_FOLDER / "MachineLearning-Lecture01.pdf"),
-]
+PDF_FILES = [str(path) for path in sorted(PDF_FOLDER.glob("*.pdf"))]               # Load every PDF in rag_docs
 
 # ─────────────────────────────────────────────
 # UTILITIES  (imported by retrieval.py and generation.py)

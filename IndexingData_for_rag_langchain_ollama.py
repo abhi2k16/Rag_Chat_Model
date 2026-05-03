@@ -21,14 +21,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-PDF_FOLDER = "c:\\Users\\abhij\\Desktop\\GenAIwithLLMs\\LangChain_projects\\"
-TRACKER_FILE = os.path.join(PDF_FOLDER, "doc_change_tracker.json")
+PROJECT_FOLDER = Path(__file__).resolve().parent
+PDF_FOLDER = PROJECT_FOLDER / "rag_docs"
+TRACKER_FILE = str(PROJECT_FOLDER / "doc_change_tracker.json")
 
-# Add all PDF files to index here
-PDF_FILES = [
-    os.path.join(PDF_FOLDER, "Attention_is_All_You_Need.pdf"),
-    os.path.join(PDF_FOLDER, "MachineLearning-Lecture01.pdf"),
-]
+# Load every PDF file in rag_docs.
+PDF_FILES = [str(path) for path in sorted(PDF_FOLDER.glob("*.pdf"))]
 
 # ─────────────────────────────────────────────
 # DOCUMENT CHANGE TRACKING UTILITIES
@@ -103,6 +101,9 @@ print("=" * 50)
 tracker = load_tracker()
 files_to_index = []
 
+if not PDF_FILES:
+    raise FileNotFoundError(f"No PDF files found in {PDF_FOLDER}")
+
 for pdf_path in PDF_FILES:
     filename = Path(pdf_path).name
     has_changed, status = check_document_changes(pdf_path, tracker)
@@ -153,6 +154,8 @@ for pdf_path, doc_id in files_to_index:
     print(f"  Loaded {page_count} pages | doc_id: {doc_id} | file: {filename}")
 
 print(f"\n  Total pages loaded : {len(docs)}")
+if not docs:
+    raise ValueError(f"No extractable text found in PDFs under {PDF_FOLDER}")
 print(f"  Sample metadata    : {docs[0].metadata}\n")
 
 # ─────────────────────────────────────────────
@@ -213,7 +216,7 @@ vectorstore = InMemoryVectorStore(embeddings)
 retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
 
 # SQLite-backed RecordManager to track what has been indexed
-RECORD_DB = f"sqlite:///{PDF_FOLDER}record_manager.db"
+RECORD_DB = f"sqlite:///{(PROJECT_FOLDER / 'record_manager.db').as_posix()}"
 record_manager = SQLRecordManager(namespace="inmemory/docs", db_url=RECORD_DB)
 record_manager.create_schema()
 

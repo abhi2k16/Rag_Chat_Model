@@ -43,7 +43,7 @@ the pipeline runs in this order:
 
 1. Load project configuration and helper functions from `IndexingDocs_for_rag.py`.
 2. Load document ingestion and vector-store setup functions from `retrieval_rag.py`.
-3. Read the configured PDF files.
+3. Read every PDF file in `rag_docs/`.
 4. Extract and clean text from each PDF page.
 5. Split pages into overlapping text chunks.
 6. Create HuggingFace embeddings for the chunks.
@@ -278,6 +278,12 @@ Install them in your active Python environment if they are missing.
 
 The active configuration is inside `IndexingDocs_for_rag.py`.
 
+PDF documents are loaded automatically from:
+
+```text
+rag_docs/
+```
+
 Check these values before running:
 
 ```python
@@ -289,7 +295,7 @@ PG_CONNECTION
 COLLECTION_NAME
 ```
 
-If PDFs are moved, update `PDF_FILES` so each path points to an existing file.
+If PDFs are moved, put them in `rag_docs/` or update `PDF_FOLDER` in `IndexingDocs_for_rag.py`.
 
 ### 4. Run generation
 
